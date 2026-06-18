@@ -4,9 +4,16 @@ phases:
     runtime-versions:
       java: corretto8
     commands:
-      - yum install -y maven
+      # Le 'yum install maven' d'Amazon Linux 2 fournit Maven 3.0.5, trop ancien
+      # pour maven-compiler-plugin 3.11.0 / maven-war-plugin 3.4.0 (exigent Maven >= 3.2.5).
+      # On installe donc un Maven recent.
+      - curl -fsSL https://archive.apache.org/dist/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz -o /tmp/maven.tgz
+      - tar -xzf /tmp/maven.tgz -C /opt
+      - export PATH=/opt/apache-maven-3.9.9/bin:$PATH
+      - mvn -v
   build:
     commands:
+      - export PATH=/opt/apache-maven-3.9.9/bin:$PATH
       - mvn clean install
       - mvn package
       - mkdir output
